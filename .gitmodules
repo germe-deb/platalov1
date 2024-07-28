@@ -1,6 +1,13 @@
+# SPDX-FileCopyrightText: 2024 dpkgluci
+#
+# SPDX-License-Identifier: MIT
+
 [submodule "lib/baton"]
 	path = lib/baton
 	url = https://github.com/tesselode/baton.git
 [submodule "lib/bump"]
 	path = lib/bump
 	url = https://github.com/kikito/bump.lua.git
+[submodule "lib/anim8"]
+	path = lib/anim8
+	url = https://github.com/kikito/anim8.git

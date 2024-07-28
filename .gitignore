@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 dpkgluci
+#
+# SPDX-License-Identifier: MIT
+
 # Compiled Lua sources
 luac.out
 
