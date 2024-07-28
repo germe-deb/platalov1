@@ -1,3 +1,6 @@
 [submodule "lib/baton"]
 	path = lib/baton
 	url = https://github.com/tesselode/baton.git
+[submodule "lib/bump"]
+	path = lib/bump
+	url = https://github.com/kikito/bump.lua.git
