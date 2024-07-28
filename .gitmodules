@@ -1,0 +1,3 @@
+[submodule "lib/baton"]
+	path = lib/baton
+	url = https://github.com/tesselode/baton.git
