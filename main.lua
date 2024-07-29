@@ -3,55 +3,113 @@
 -- SPDX-License-Identifier: MIT
 
 -- libraries:
--- https://github.com/tesselode/baton input management
-local baton = require 'lib/baton/baton'
--- https://github.com/tesselode/baton collision and reaction
+-- https://github.com/tesselode/Baton input management
+Baton = require 'lib/baton/baton'
+-- https://github.com/tesselode/Baton collision and reaction
 local bump = require 'lib/bump/bump'
+-- https://github.com/karai17/Simple-Tiled-Implementation maps
+local sti = require 'lib/sti/sti'
 -- https://github.com/kikito/anim8 sprite animations
 local anim8 = require 'lib/anim8/anim8'
 
--- key mapping (usando baton)
-local player = baton.new {
-    controls = {
-        left = {'key:left', 'button:dpleft', 'axis:leftx-'},
-        right = {'key:right', 'button:dpright', 'axis:leftx+'},
-        up = {'key:up', 'button:dpup', 'axis:lefty-'},
-        down = {'key:down', 'button:dpdown', 'axis:lefty+'},
-
-        action = {'key:t', 'button:b'},
-    },
-    pairs = {
-        move = {"left", "right", "up", "down"}
-    },
-    joystick = love.joystick.getJoysticks()[1],
-}
-
-
 -- variables
-local px, py = 0, 0
+local gamescale = 4
+
+-- bump
+-- crear un mundo en bump
+World = bump.newWorld(32)
+-- sti
+-- cargar el mapa
+local map = sti("assets/maps/debug map.lua", {"bump"})
+-- iniciar integracíon de sti con bump.
+-- map pertenece a sti, y bump_init es un plugin de sti para
+-- darle info a bump.
+map:bump_init(World)
+map.layers.object.visible = false
+
+-- archivo lua del jugador
+require("assets/scripts/player")
+
+--[[
+-- me quedo con esta función que dibuja lindo los bloques
+-- aunque no la vamos a usar jaja
+
+-- dibujar bloques
+local function drawBlocks()
+  for _,block in ipairs(blocks) do
+    drawBox(block, 1,0,0)
+  end
+end
+
+-- helper function
+function drawBox(box, r,g,b)
+  love.graphics.push("all")
+  love.graphics.setColor(r,g,b,0.25)
+  love.graphics.rectangle("fill", box.x, box.y, box.w, box.h)
+  love.graphics.setColor(r,g,b)
+  love.graphics.rectangle("line", box.x, box.y, box.w, box.h)
+  love.graphics.pop()
+end
+]]
+
+-- draw player
+--[[
+function drawPlayer()
+  love.graphics.push("all")
+  love.graphics.setColor(1,0,1,0.25)
+  love.graphics.rectangle("fill", Playerc.x, Playerc.y, Playerc.w, Playerc.h)
+  love.graphics.setColor(1,0,1)
+  love.graphics.rectangle("line", Playerc.x, Playerc.y, Playerc.w, Playerc.h)
+  love.graphics.pop()
+end
+]]
 
 -- aca empieza el codigo
 
 function love.load()
-    
+  Player:load()
+
 end
 
 function love.update(dt)
-    player:update()
+  -- refrescar el input
 
-    -- local x, y = input:get 'move'
-    -- playership:move(x*100, y*100)
-    if player:down 'left' then
-        px = px - 10
-    end
-    if player:down 'right' then
-        px = px + 10
-    end
+  -- bump world update
+  -- World:update(dt)
+
+  Player:update(dt)
+  -- hay que rehacer esto con las fisicas en cuenta 
+  --[[
+  if Batonplayer:down 'left' then
+    Playerc.x = Playerc.x - 4*8*dt
+  end
+  if Batonplayer:down 'right' then
+    Playerc.x = Playerc.x + 4*8*dt
+  end
+  ]]
+
+  -- bumpPlayercollision = World:check(bumpplayer)
 end
 
 function love.draw()
-    love.graphics.rectangle("fill", px, py, 50, 50)
+  -- INTERFAZ
+  -- poner color blanco
+  love.graphics.setColor(1, 1, 1, 1)
+  -- la idea es que esto diga cuando colisiona
+	-- love.graphics.print(tostring(bumpPlayercollision))
+  
+  -- MUNDO
+  love.graphics.push("all")
+  love.graphics.scale(gamescale, gamescale)
 
+  -- dibujar al jugador
+  Player:draw()
+  -- love.graphics.rectangle("fill", Playerc.x, Playerc.y, 8, 8)
+	-- drawBlocks()
+
+  -- dibujar el mapa
+  map:draw(0, 0, gamescale, gamescale)
+  love.graphics.pop()
 end
 
 function love.keypressed(key)
@@ -59,3 +117,4 @@ function love.keypressed(key)
 		love.event.quit()
 	end
 end
+
