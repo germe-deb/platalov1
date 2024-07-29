@@ -14,6 +14,8 @@ local anim8 = require 'lib/anim8/anim8'
 
 -- variables
 local gamescale = 4
+Onground = false
+Len = 0
 
 -- bump
 -- crear un mundo en bump
@@ -75,7 +77,6 @@ function love.update(dt)
   -- refrescar el input
 
   -- bump world update
-  -- World:update(dt)
 
   Player:update(dt)
   -- hay que rehacer esto con las fisicas en cuenta 
@@ -93,10 +94,8 @@ end
 
 function love.draw()
   -- INTERFAZ
-  -- poner color blanco
   love.graphics.setColor(1, 1, 1, 1)
-  -- la idea es que esto diga cuando colisiona
-	-- love.graphics.print(tostring(bumpPlayercollision))
+  love.graphics.print(tostring(Onground))
   
   -- MUNDO
   love.graphics.push("all")
@@ -104,8 +103,6 @@ function love.draw()
 
   -- dibujar al jugador
   Player:draw()
-  -- love.graphics.rectangle("fill", Playerc.x, Playerc.y, 8, 8)
-	-- drawBlocks()
 
   -- dibujar el mapa
   map:draw(0, 0, gamescale, gamescale)

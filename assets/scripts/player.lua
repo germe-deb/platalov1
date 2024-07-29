@@ -8,7 +8,7 @@ local batonplayer = Baton.new {
     up = {'key:up', 'button:dpup', 'axis:lefty-'},
     down = {'key:down', 'button:dpdown', 'axis:lefty+'},
     
-    action = {'key:t', 'button:b'},
+    action = {'key:t', 'key:space', 'button:b'},
   },
   pairs = {
       move = {"left", "right", "up", "down"}
@@ -17,7 +17,8 @@ local batonplayer = Baton.new {
 }
 
 -- some variables
-local acc = {x=0, y=0}
+local canjump = true
+local acc = {x=0, y=0, initial=-0.55}
 local playerc = {x=8, y=8, w=8, h=8}
 local bumpplayer = {playerc.x, playerc.y, playerc.w, playerc.h}
 World:add(bumpplayer, playerc.x, playerc.y, playerc.w, playerc.h)
@@ -29,33 +30,51 @@ function Player:load()
   -- playerc.y
   -- playerc.w
   -- playerc.h
+  
 
 end
 
 function Player:update(dt)
   batonplayer:update(dt)
-  -- local actualX, actualY = World:move(player, goalX, goalY)
-  -- local playerc.x, playerc.y = World:move(player, goalX, goalY)
   local goalX, goalY = playerc.x, playerc.y
 
   -- code for X movement
   if batonplayer:down 'left' then
-    goalX = playerc.x - 32*dt
+    goalX = playerc.x - 80*dt
     --playerc.x = playerc.x - 4*8*dt
   end
   if batonplayer:down 'right' then
-    goalX = playerc.x + 32*dt
+    goalX = playerc.x + 80*dt
     --playerc.x = playerc.x + 4*8*dt
   end
-
+  
   -- code for gravity
   -- si bumpplayer no esta tocando nada collidable entonces
-  acc.y = acc.y +1*dt
+  acc.y = acc.y +1.4*dt
+  -- max gravity
+  if acc.y > 1 then acc.y = 1 end
+  -- agregar la aceleración a goalY
   goalY = playerc.y + acc.y
+  
+  if batonplayer:down 'action' and Onground == true then
+    acc.y = acc.initial
+    goalY = playerc.y + acc.y
+    Onground = false
+  end
 
   -- try to apply goal to the actual player coords
-  playerc.x, playerc.y = World:move(bumpplayer, goalX, goalY)
-  
+  local cols = 0
+  playerc.x, playerc.y, cols, Len = World:move(bumpplayer, goalX, goalY)
+  if Len ~= 0 and acc.y >= 0 then
+    Onground = true
+  else
+    Onground = false
+  end
+
+  -- debug
+  for i=1,Len do
+    print('collided with ' .. tostring(cols[i].other))
+  end
 end
 
 function Player:draw()
