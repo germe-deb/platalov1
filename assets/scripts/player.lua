@@ -82,6 +82,7 @@ function Player:update(dt)
     print('collided with ' .. tostring(cols[i].other))
   end
   
+  Axel = acc.y
 end
 
 function Player:draw()
