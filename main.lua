@@ -11,11 +11,15 @@ local bump = require 'lib/bump/bump'
 local sti = require 'lib/sti/sti'
 -- https://github.com/kikito/anim8 sprite animations
 local anim8 = require 'lib/anim8/anim8'
+-- https://github.com/vrld/hump camera library
+local camera = require 'lib/hump/camera'
 
 -- variables
 local gamescale = 4
 Onground = false
-Len = 0
+LenP = 0
+-- LenF = 0
+Axel = 0
 
 -- bump
 -- crear un mundo en bump
@@ -95,7 +99,9 @@ end
 function love.draw()
   -- INTERFAZ
   love.graphics.setColor(1, 1, 1, 1)
-  love.graphics.print(tostring(Onground))
+  love.graphics.print(tostring(Onground), 0, 0)
+  -- mover el cursor hacia abajo
+  love.graphics.print(tostring(Axel), 0, 20)
   
   -- MUNDO
   love.graphics.push("all")
