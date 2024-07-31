@@ -16,10 +16,10 @@ local camera = require 'lib/hump/camera'
 
 -- variables
 local gamescale = 4
-Onground = false
 LenP = 0
 -- LenF = 0
 Axel = 0
+PlayercminusGoalY = 0
 
 -- bump
 -- crear un mundo en bump
@@ -99,9 +99,9 @@ end
 function love.draw()
   -- INTERFAZ
   love.graphics.setColor(1, 1, 1, 1)
-  love.graphics.print(tostring(Onground), 0, 0)
   -- mover el cursor hacia abajo
-  love.graphics.print(tostring(Axel), 0, 20)
+  love.graphics.print("aceleración: " .. tostring(Axel), 0, 20)
+  love.graphics.print("goaly - pl.y: " .. tostring(PlayercminusGoalY), 0, 40)
   
   -- MUNDO
   love.graphics.push("all")
