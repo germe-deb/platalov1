@@ -17,8 +17,9 @@ local batonplayer = Baton.new {
 }
 
 -- some variables
-local acc = {x=0, y=0, initial=-0.55}
+local acc = {x=0, y=0, initial=-2, ry=0, max=5}
 local playerc = {x=8, y=8, w=8, h=8}
+local gravedad = 0.08
 
 local bumpplayer = {playerc.x, playerc.y, playerc.w, playerc.h}
 World:add(bumpplayer, playerc.x, playerc.y, playerc.w, playerc.h)
@@ -50,36 +51,39 @@ function Player:update(dt)
     --playerc.x = playerc.x + 4*8*dt
   end
   
+  -- guardar la posición en Y
+  local y1 = playerc.y
   -- code for gravity
   -- si bumpplayer no esta en el piso
   if Onground == false then
-    acc.y = acc.y +1.4*dt
+    acc.y = acc.y + gravedad
+  else 
+    acc.y = acc.ry
   end
-  -- max gravity
-  if acc.y > 1 then acc.y = 1 end
   -- agregar la aceleración a goalY
-  goalY = playerc.y + acc.y
   
   if batonplayer:down 'action' and Onground == true then
-    acc.y = acc.initial
-    goalY = playerc.y + acc.y
+    acc.y = acc.initial 
   end
+  
+  -- definir el gol x como la posición y + aceleración y
+  goalY = playerc.y + acc.y*100*dt
 
+  -- max gravity
+  if acc.y > acc.max then acc.y = acc.max end
+  
   -- try to apply goal to the actual player coords
-  local cols = 0
   -- _, _, _, LenF = World:move(bumpfeet, goalX, goalY)
-  playerc.x, playerc.y, cols, LenP = World:move(bumpplayer, goalX, goalY)
-  if LenP ~= 0 and acc.y >= 0 then
+  playerc.x, playerc.y, _, LenP = World:move(bumpplayer, goalX, goalY)
+  
+  local y2 = playerc.y
+  acc.ry = y1 - y2
+  if LenP ~= 0 and acc.y >= 0 and acc.ry == 0 then
     Onground = true
     print('onground true')
   else
     Onground = false
     print('onground false')
-  end
-
-  -- debug
-  for i=1,LenP do
-    print('collided with ' .. tostring(cols[i].other))
   end
   
   Axel = acc.y
