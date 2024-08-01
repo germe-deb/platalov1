@@ -40,7 +40,7 @@ Map.layers.spike.visible = false
 require("assets/scripts/player")
 
 function love.load()
-  Player:load()
+
 end
 
 function love.update(dt)
@@ -53,7 +53,7 @@ function love.draw()
   -- mover el cursor hacia abajo
   love.graphics.print("aceleración: " .. tostring(Axel), 0, 20)
   love.graphics.print("goaly - pl.y: " .. tostring(PLmGY), 0, 40)
-  
+
   -- MUNDO
   love.graphics.push("all")
   love.graphics.scale(gamescale, gamescale)
@@ -71,4 +71,3 @@ function love.keypressed(key)
 		love.event.quit()
 	end
 end
-

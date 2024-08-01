@@ -7,9 +7,9 @@ local batonplayer = Baton.new {
     right = {'key:right', 'button:dpright', 'axis:leftx+'},
     up = {'key:up', 'button:dpup', 'axis:lefty-'},
     down = {'key:down', 'button:dpdown', 'axis:lefty+'},
-    
+
     jump = {'key:t', 'key:space', 'button:b'},
-    cancel = {'key:q', 'key:escape', 'button:start'},
+    menu = {'key:p', 'key:return', 'button:start'},
   },
   pairs = {
       move = {"left", "right", "up", "down"}
@@ -31,6 +31,14 @@ Player = {}
 local bumpplayer = {pl.x, pl.y, pl.w, pl.h, isPlayer=true}
 World:add(bumpplayer, pl.x, pl.y, pl.w, pl.h)
 
+-- zona de funciones
+
+function pinchado()
+  pl.x, pl.y = 8, 176
+  goalX, goalY = 8, 176
+  print("me morí")
+end
+
 -- filtros
 local collidablefilter = function(_, other)
   if other.type == "spike" then
@@ -45,15 +53,11 @@ local collidablefilter = function(_, other)
 end
 
 
-function Player:load()
-  
-end
-
 function Player:update(dt)
   batonplayer:update(dt)
   local goalX, goalY = pl.x, pl.y
-  
-  -- 
+
+  --
   -- code for X movement
   if batonplayer:down 'left' then
     acc.x = acc.x - acc.fx*dt
@@ -62,38 +66,38 @@ function Player:update(dt)
   elseif acc.x < 0.2 and acc.x > -0.2 then
   acc.x = 0
   end
-  
+
   if acc.x > 0 then
     acc.x = acc.x - acc.fx*dt*0.5
   elseif acc.x < 0 then
     acc.x = acc.x + acc.fx*dt*0.5
   end
-  
+
   if acc.x > acc.maxX then
     acc.x = acc.maxX
   elseif acc.x < -acc.maxX then
     acc.x = -acc.maxX
   end
-  
+
   goalX = pl.x + acc.x
-  
+
   -- code for gravity
   acc.y = gravedad * dt + acc.y
 
   if batonplayer:down 'jump' and onground == true then
-    acc.y = acc.initial 
+    acc.y = acc.initial
   end
-  
+
   -- definir el gol y como la posición y + aceleración y
   goalY = pl.y + acc.y*100*dt
 
   -- max gravity
   if acc.y > acc.max then acc.y = acc.max end
-  
-  
+
+
   -- tratar de moverse
   pl.x, pl.y, col, LenP = World:move(bumpplayer, goalX, goalY, collidablefilter)
-  
+
   PLmGY = goalY - pl.y
   PLmGX = goalX - pl.x
   -- detección de "en el piso"
@@ -115,7 +119,7 @@ function Player:update(dt)
     touchingceiling = false
     -- print('touchingceiling false')
   end
-  
+
   -- choque (horizontal)
   if PLmGX ~= 0 then
     choque = true
@@ -125,10 +129,21 @@ function Player:update(dt)
     choque = false
   end
 
+  -- intento de detección de pinchos
+  --[[
+  for k, v in pairs(col) do
+    if col.type == "spike" then
+      pinchado()
+    end
+  end
+  ]]
+  if batonplayer:pressed "menu" then
+    pinchado()
+  end
+
   Axel = acc.y
   -- debug
   -- print("player pos:" .. math.floor(pl.x) .. "  " .. math.floor(pl.y))
-
 end
 
 function Player:draw()
