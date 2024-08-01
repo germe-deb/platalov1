@@ -11,3 +11,5 @@ if you want to clone this project you have to run
 ```
 git clone --recursive https://github.com/germe-deb/platalov1
 ```
+
+note to myself: I should configure https://github.com/love-actions when I have something playable
