@@ -17,3 +17,6 @@
 [submodule "lib/hump"]
 	path = lib/hump
 	url = https://github.com/vrld/hump
+[submodule "lib/i18n"]
+	path = lib/i18n
+	url = https://github.com/excessive/i18n.git

@@ -8,7 +8,8 @@ local batonplayer = Baton.new {
     up = {'key:up', 'button:dpup', 'axis:lefty-'},
     down = {'key:down', 'button:dpdown', 'axis:lefty+'},
     
-    action = {'key:t', 'key:space', 'button:b'},
+    jump = {'key:t', 'key:space', 'button:b'},
+    cancel = {'key:q', 'key:escape', 'button:start'},
   },
   pairs = {
       move = {"left", "right", "up", "down"}
@@ -17,61 +18,86 @@ local batonplayer = Baton.new {
 }
 
 -- some variables
-local acc = {x=0, y=0, initial=-1.38, ry=0, max=6}
-local pl = {x=8, y=108, w=8, h=8}
+local acc = {x=0, y=0, initial=-1.38, ry=0, max=6, fx=15, maxX=1.5}
+local pl = {x=8, y=176, w=7.6, h=7.6}
 local gravedad = 4
+
 local onground = false
 local touchingceiling = false
-
-local bumpplayer = {pl.x, pl.y, pl.w, pl.h}
-World:add(bumpplayer, pl.x, pl.y, pl.w, pl.h)
--- local bumpfeet = {pl.x, pl.y+3.6, pl.w*0.8, pl.h*0.2}
--- World:add(bumpfeet, pl.x, pl.y+3.6, pl.w*0.8, pl.h*0.2)
+local choque = false
 
 Player = {}
 
-function Player:load()
+local bumpplayer = {pl.x, pl.y, pl.w, pl.h, isPlayer=true}
+World:add(bumpplayer, pl.x, pl.y, pl.w, pl.h)
 
+-- filtros
+local collidablefilter = function(_, other)
+  if other.type == "spike" then
+    return "cross"
+  elseif other.type == "ending" then
+    return "slide"
+  elseif other.type == "coin" then
+    return "cross"
+  else
+    return "slide"
+  end
+end
+
+
+function Player:load()
+  
 end
 
 function Player:update(dt)
   batonplayer:update(dt)
   local goalX, goalY = pl.x, pl.y
-
+  
+  -- 
   -- code for X movement
   if batonplayer:down 'left' then
-    goalX = pl.x - 80*dt
-    --pl.x = pl.x - 4*8*dt
+    acc.x = acc.x - acc.fx*dt
+  elseif batonplayer:down 'right' then
+    acc.x = acc.x + acc.fx*dt
+  elseif acc.x < 0.2 and acc.x > -0.2 then
+  acc.x = 0
   end
-  if batonplayer:down 'right' then
-    goalX = pl.x + 80*dt
-    --pl.x = pl.x + 4*8*dt
+  
+  if acc.x > 0 then
+    acc.x = acc.x - acc.fx*dt*0.5
+  elseif acc.x < 0 then
+    acc.x = acc.x + acc.fx*dt*0.5
   end
+  
+  if acc.x > acc.maxX then
+    acc.x = acc.maxX
+  elseif acc.x < -acc.maxX then
+    acc.x = -acc.maxX
+  end
+  
+  goalX = pl.x + acc.x
   
   -- code for gravity
   acc.y = gravedad * dt + acc.y
-  
-  -- agregar la aceleración a goalY
-  
-  if batonplayer:down 'action' and onground == true then
+
+  if batonplayer:down 'jump' and onground == true then
     acc.y = acc.initial 
   end
   
-  -- definir el gol x como la posición y + aceleración y
+  -- definir el gol y como la posición y + aceleración y
   goalY = pl.y + acc.y*100*dt
 
   -- max gravity
   if acc.y > acc.max then acc.y = acc.max end
   
   
-  -- try to apply goal to the actual player coords
-  -- _, _, _, LenF = World:move(bumpfeet, goalX, goalY)
-  pl.x, pl.y, _, LenP = World:move(bumpplayer, goalX, goalY)
+  -- tratar de moverse
+  pl.x, pl.y, col, LenP = World:move(bumpplayer, goalX, goalY, collidablefilter)
   
-  PlayercminusGoalY = goalY - pl.y
-  
+  PLmGY = goalY - pl.y
+  PLmGX = goalX - pl.x
   -- detección de "en el piso"
-  if PlayercminusGoalY > 0 then
+  if PLmGY > 0 then
     onground = true
     print('onground true')
     acc.y = 0
@@ -81,7 +107,7 @@ function Player:update(dt)
   end
 
   -- detección de "toqué el techo"
-  if PlayercminusGoalY < 0 then
+  if PLmGY < 0 then
     touchingceiling = true
     print('touchingceiling true')
     acc.y = 0
@@ -89,16 +115,26 @@ function Player:update(dt)
     touchingceiling = false
     -- print('touchingceiling false')
   end
+  
+  -- choque (horizontal)
+  if PLmGX ~= 0 then
+    choque = true
+    print('choque')
+    acc.x = 0
+  else
+    choque = false
+  end
+
   Axel = acc.y
   -- debug
-  print("player pos:" .. math.floor(pl.x) .. "  " .. math.floor(pl.y))
+  -- print("player pos:" .. math.floor(pl.x) .. "  " .. math.floor(pl.y))
 
 end
 
 function Player:draw()
   love.graphics.push("all")
   love.graphics.setColor(1,0,1,0.25)
-  love.graphics.rectangle("fill", pl.x, pl.y, pl.w, pl.h)
+  love.graphics.rectangle("fill", pl.x, pl.y, pl.w-(pl.w*0.1), pl.h-(pl.h*0.1))
   love.graphics.setColor(1,0,1)
   love.graphics.rectangle("line", pl.x, pl.y, pl.w, pl.h)
   love.graphics.pop()
