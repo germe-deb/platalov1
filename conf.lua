@@ -1,5 +1,5 @@
 function love.conf(t)
-    t.title = "Platformer"
+    t.title = "Platalov1"
     t.version = "11.5"
     t.console = true
     t.window.width = 800

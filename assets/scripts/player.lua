@@ -82,7 +82,7 @@ function Player:update(dt)
     acc.x = -acc.maxX
   end
 
-  goalX = pl.x + acc.x
+  goalX = pl.x + acc.x*60*dt
 
   -- code for gravity
   acc.y = gravedad * dt + acc.y
