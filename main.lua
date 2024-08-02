@@ -28,13 +28,15 @@ PLmGY = 0
 World = bump.newWorld(32)
 -- sti
 -- cargar el mapa
-Map = sti("assets/maps/debug map.lua", {"bump"})
+--Map = sti("assets/maps/debug map.lua", {"bump"})
+Map = sti("assets/maps/begginings.lua", {"bump"})
 -- iniciar integracíon de sti con bump.
 -- Map pertenece a sti, y bump_init es un plugin de sti para
 -- darle info a bump.
 Map:bump_init(World)
 Map.layers.object.visible = false
 Map.layers.spike.visible = false
+Map.layers.special.visible = false
 
 -- archivo lua del jugador
 require("assets/scripts/player")
@@ -58,11 +60,11 @@ function love.draw()
   love.graphics.push("all")
   love.graphics.scale(gamescale, gamescale)
 
-  -- dibujar al jugador
-  Player:draw()
-
   -- dibujar el mapa
   Map:draw(0, 0, gamescale, gamescale)
+
+    -- dibujar al jugador
+    Player:draw()
   love.graphics.pop()
 end
 

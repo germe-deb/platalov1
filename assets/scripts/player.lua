@@ -8,7 +8,7 @@ local batonplayer = Baton.new {
     up = {'key:up', 'button:dpup', 'axis:lefty-'},
     down = {'key:down', 'button:dpdown', 'axis:lefty+'},
 
-    jump = {'key:t', 'key:space', 'button:b'},
+    jump = {'key:t', 'key:space', 'button:a'},
     menu = {'key:p', 'key:return', 'button:start'},
   },
   pairs = {
@@ -19,12 +19,14 @@ local batonplayer = Baton.new {
 
 -- some variables
 local acc = {x=0, y=0, initial=-1.38, ry=0, max=6, fx=15, maxX=1.5}
-local pl = {x=8, y=176, w=7.6, h=7.6}
+local initialpl = {x=200, y=96}
+local pl = {x=initialpl.x, y=initialpl.y, w=7.6, h=7.6}
 local gravedad = 4
 
 local onground = false
 local touchingceiling = false
 local choque = false
+local muerto = false
 
 Player = {}
 
@@ -34,9 +36,10 @@ World:add(bumpplayer, pl.x, pl.y, pl.w, pl.h)
 -- zona de funciones
 
 function pinchado()
-  pl.x, pl.y = 8, 176
-  goalX, goalY = 8, 176
+  acc.y, acc.x = 0, 0
+  pl.x, pl.y, goalX, goalY = initialpl.x, initialpl.y, initialpl.x, initialpl.y
   print("me morí")
+  World:update(bumpplayer, initialpl.x, initialpl.y)
 end
 
 -- filtros
@@ -130,13 +133,14 @@ function Player:update(dt)
   end
 
   -- intento de detección de pinchos
-  --[[
-  for k, v in pairs(col) do
-    if col.type == "spike" then
+  for i = 1, LenP do
+    local other = col[i].other
+    if other.type == "spike" then
       pinchado()
+      return
     end
   end
-  ]]
+
   if batonplayer:pressed "menu" then
     pinchado()
   end
