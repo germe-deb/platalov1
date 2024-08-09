@@ -20,3 +20,6 @@
 [submodule "lib/i18n"]
 	path = lib/i18n
 	url = https://github.com/excessive/i18n.git
+[submodule "lib/gamera"]
+	path = lib/gamera
+	url = https://github.com/kikito/gamera

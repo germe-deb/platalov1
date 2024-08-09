@@ -11,15 +11,12 @@ local bump = require 'lib/bump/bump'
 local sti = require 'lib/sti/sti'
 -- https://github.com/kikito/anim8 sprite animations
 -- local anim8 = require 'lib/anim8/anim8'
--- https://github.com/vrld/hump camera library
--- local Camera = require 'lib/hump/camera'
 -- https://github.com/excessive/i18n translations
 -- local i18n require "lib/i18n/i18n"
 
 -- variables
 local gamescale = 3
 LenP = 0
--- LenF = 0
 Axel = 0
 PLmGY = 0
 
@@ -42,7 +39,6 @@ Map.layers.special.visible = false
 require("assets/scripts/player")
 
 function love.load()
-
 end
 
 function love.update(dt)
@@ -50,22 +46,23 @@ function love.update(dt)
 end
 
 function love.draw()
+  -- MUNDO
+  -- love.graphics.push("all")
+  -- love.graphics.scale(gamescale, gamescale)
+
+  -- dibujar el mapa
+  -- Map:draw(0, 0, gamescale, gamescale)
+  Map:draw(0, 0, 1, 1)
+
+  -- dibujar al jugador
+  Player:draw()
+  -- mundo
+  -- love.graphics.pop()
   -- INTERFAZ
   love.graphics.setColor(1, 1, 1, 1)
   -- mover el cursor hacia abajo
   love.graphics.print("aceleración: " .. tostring(Axel), 0, 20)
   love.graphics.print("goaly - pl.y: " .. tostring(PLmGY), 0, 40)
-
-  -- MUNDO
-  love.graphics.push("all")
-  love.graphics.scale(gamescale, gamescale)
-
-  -- dibujar el mapa
-  Map:draw(0, 0, gamescale, gamescale)
-
-    -- dibujar al jugador
-    Player:draw()
-  love.graphics.pop()
 end
 
 function love.keypressed(key)

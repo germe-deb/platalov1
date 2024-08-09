@@ -57,10 +57,12 @@ end
 
 
 function Player:update(dt)
+  
+  -- botones
   batonplayer:update(dt)
+  -- gol
   local goalX, goalY = pl.x, pl.y
 
-  --
   -- code for X movement
   if batonplayer:down 'left' then
     acc.x = acc.x - acc.fx*dt
