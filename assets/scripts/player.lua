@@ -10,6 +10,13 @@ local batonplayer = Baton.new {
 
     jump = {'key:t', 'key:space', 'button:a'},
     menu = {'key:p', 'key:return', 'button:start'},
+
+    -- debug controls
+
+    offsetxplus = {'key:o'},
+    offsetxminus = {'key:a'},
+    offsetyplus = {'key:e'},
+    offsetyminus = {'key:u'}
   },
   pairs = {
       move = {"left", "right", "up", "down"}
@@ -20,13 +27,15 @@ local batonplayer = Baton.new {
 -- some variables
 local acc = {x=0, y=0, initial=-1.38, ry=0, max=6, fx=15, maxX=1.5}
 local initialpl = {x=200, y=96}
-local pl = {x=initialpl.x, y=initialpl.y, w=7.6, h=7.6}
+local pl = {x=initialpl.x, y=initialpl.y, w=7.6, h=7.6, lastxdir="left"}
 local gravedad = 4
 
 local onground = false
 local touchingceiling = false
 local choque = false
 local muerto = false
+
+local gampos = {offset=20, offsetx=0, gotooffsetx=0}
 
 Player = {}
 
@@ -35,7 +44,7 @@ World:add(bumpplayer, pl.x, pl.y, pl.w, pl.h)
 
 -- zona de funciones
 
-function pinchado()
+local function pinchado()
   acc.y, acc.x = 0, 0
   pl.x, pl.y, goalX, goalY = initialpl.x, initialpl.y, initialpl.x, initialpl.y
   print("me morí")
@@ -57,7 +66,7 @@ end
 
 
 function Player:update(dt)
-  
+
   -- botones
   batonplayer:update(dt)
   -- gol
@@ -66,8 +75,10 @@ function Player:update(dt)
   -- code for X movement
   if batonplayer:down 'left' then
     acc.x = acc.x - acc.fx*dt
+    pl.lastxdir="left"
   elseif batonplayer:down 'right' then
     acc.x = acc.x + acc.fx*dt
+    pl.lastxdir="right"
   elseif acc.x < 0.2 and acc.x > -0.2 then
   acc.x = 0
   end
@@ -108,7 +119,7 @@ function Player:update(dt)
   -- detección de "en el piso"
   if PLmGY > 0 then
     onground = true
-    print('onground true')
+    -- print('onground true')
     acc.y = 0
   else
     onground = false
@@ -118,7 +129,7 @@ function Player:update(dt)
   -- detección de "toqué el techo"
   if PLmGY < 0 then
     touchingceiling = true
-    print('touchingceiling true')
+    -- print('touchingceiling true')
     acc.y = 0
   else
     touchingceiling = false
@@ -128,7 +139,7 @@ function Player:update(dt)
   -- choque (horizontal)
   if PLmGX ~= 0 then
     choque = true
-    print('choque')
+    -- print('choque')
     acc.x = 0
   else
     choque = false
@@ -148,8 +159,75 @@ function Player:update(dt)
   end
 
   Axel = acc.y
+
+  -- camera
+  -- old code:
+
+  -- Gam:setPosition(pl.x, pl.y)
+
+  -- new (non functional) code:
+  --[[
+  if pl.lastxdir == "right" then
+    gampos.gotox = pl.x + gampos.offset
+  elseif pl.lastxdir == "left" then
+    gampos.gotox = pl.x - gampos.offset
+  end
+
+  if gampos.x == gampos.gotox then
+    gampos.x = gampos.gotox
+  elseif gampos.x > gampos.gotox then
+    gampos.x = gampos.x - 1
+  elseif gampos.x < gampos.gotox then
+    gampos.x = gampos.x + 1
+  end
+  
+  Gam:setPosition(gampos.x, pl.y)
+  ]]
+
+  if pl.lastxdir == "right" then
+    gampos.gotooffsetx = gampos.offset
+  elseif pl.lastxdir == "left" then
+    gampos.gotooffsetx = -1*gampos.offset
+  end
+  
+  if gampos.offsetx < gampos.gotooffsetx then
+    gampos.offsetx = gampos.offsetx + 60*dt
+  elseif gampos.offsetx > gampos.gotooffsetx then
+    gampos.offsetx = gampos.offsetx - 60*dt
+  end
+
+  if pl.lastxdir == "right" and gampos.offsetx > gampos.gotooffsetx then
+    gampos.offsetx = gampos.gotooffsetx
+  elseif pl.lastxdir == "left" and gampos.offsetx < gampos.gotooffsetx then
+    gampos.offsetx = gampos.gotooffsetx
+  end
+
+
+  Gam:setPosition(pl.x+gampos.offsetx, pl.y)
+  
+
+
   -- debug
   -- print("player pos:" .. math.floor(pl.x) .. "  " .. math.floor(pl.y))
+
+
+  -- debug functions, not releated to the player actually
+
+  -- offset map
+  if batonplayer:down 'offsetxminus' then
+    Cameraoffset.x = Cameraoffset.x - 2*dt
+  end
+  if batonplayer:down 'offsetxplus' then
+    Cameraoffset.x = Cameraoffset.x + 2*dt
+  end
+  if batonplayer:down 'offsetyminus' then
+    Cameraoffset.y = Cameraoffset.y - 2*dt
+  end
+  if batonplayer:down 'offsetyplus' then
+    Cameraoffset.y = Cameraoffset.y + 2*dt
+  end
+
+
 end
 
 function Player:draw()
